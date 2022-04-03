@@ -1,3 +1,4 @@
+import botocore.exceptions
 from decouple import config  # ATTENTION, after running this line & change the *.env, rerun python (clear cache)
 import praw
 import pandas as pd
@@ -56,7 +57,10 @@ last_day = int(datetime.now().timestamp())
 # assets_list = ['bitcoin', 'btc', 'eth', 'ethereum', 'binance', 'bnb', 'ripple', 'xrp', 'terra', 'luna', 'coin',
 #                'cryptocur', 'cardano', 'ada', 'solana', 'sol', 'avalanche', 'avax', 'polkadot', 'dot', 'dogecoin',
 #                'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver', 'swiss market index']
-assets_list = ['swiss market index', 'bitcoin', 'ethereum', 'binance', 'ripple', 'terra', 'luna', 'coin',
+# assets_list = ['swiss market index', 'bitcoin', 'ethereum', 'binance', 'ripple', 'terra', 'luna', 'coin',
+#                'cryptocurrency', 'cardano', 'solana', 'avalanche', 'avax', 'polkadot', 'dogecoin',
+#                'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver']
+assets_list = ['ethereum', 'binance', 'ripple', 'terra', 'luna', 'coin',
                'cryptocurrency', 'cardano', 'solana', 'avalanche', 'avax', 'polkadot', 'dogecoin',
                'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver']
 
@@ -71,17 +75,18 @@ assets_list = ['swiss market index', 'bitcoin', 'ethereum', 'binance', 'ripple',
 
 # get comments
 api = PushshiftAPI()
-# limit = 15000
+limit = 2000000
 bucket_name = 'teambucketscj'
 
 cnt = 0
 cntr = 0
 
-def comment_scraper(sub, before, after, filter):
+def comment_scraper(sub, before, after, filter, limit):
     print(f'Looking for comments in Subreddit {sub} ...')
     comments = api.search_comments(subreddit=sub,
                                    before=before,
                                    after=after,
+                                   limit=limit,
                                    filter=filter,
                                    mem_safe=True,
                                    safe_exit=True)
@@ -110,14 +115,18 @@ start = datetime.now()
 stopping = start + timedelta(hours = timelimit)
 
 for sub in assets_list:
+    cnt +=1
+    comments = comment_scraper(sub=sub, before=last_day, after=first_day, filter=fields, limit=limit)
+    cntr += len(comments)
+    file_name = comment_tocsv(sub=sub, comments_pack=comments)
     if stopping > datetime.now():
-        cnt +=1
-        comments = comment_scraper(sub=sub, before=last_day, after=first_day, filter=fields)
-        cntr += len(comments)
-        file_name = comment_tocsv(sub=sub, comments_pack=comments)
-        upload_s3(file=file_name, bucket=bucket_name)
+        try:
+            upload_s3(file=file_name, bucket=bucket_name)
+        except botocore.exceptions.ClientError as e:
+            print(e)
     else:
-        break
+        print('Credentials of AWS expired: No uploads possible')
+
 
 print(f'Retrieve and Upload finished: {cnt} Files uploaded with total {cntr} Comments.')
 
