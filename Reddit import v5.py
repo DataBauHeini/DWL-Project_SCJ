@@ -54,15 +54,10 @@ first_day = int(datetime(2021, 1, 1, 0, 0).timestamp())
 last_day = int(datetime.now().timestamp())
 
 # list of assets to look for subreddits (excl. smi, nothing found by hand in those special cases)
-# assets_list = ['bitcoin', 'btc', 'eth', 'ethereum', 'binance', 'bnb', 'ripple', 'xrp', 'terra', 'luna', 'coin',
-#                'cryptocur', 'cardano', 'ada', 'solana', 'sol', 'avalanche', 'avax', 'polkadot', 'dot', 'dogecoin',
-#                'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver', 'swiss market index']
-# assets_list = ['swiss market index', 'bitcoin', 'ethereum', 'binance', 'ripple', 'terra', 'luna', 'coin',
-#                'cryptocurrency', 'cardano', 'solana', 'avalanche', 'avax', 'polkadot', 'dogecoin',
-#                'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver']
-assets_list = ['ethereum', 'binance', 'ripple', 'terra', 'luna', 'coin',
-               'cryptocurrency', 'cardano', 'solana', 'avalanche', 'avax', 'polkadot', 'dogecoin',
-               'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver']
+assets_list = ['bitcoin', 'btc', 'eth', 'ethereum', 'binance', 'bnb', 'ripple', 'xrp', 'terra', 'luna', 'coin',
+               'cryptocur', 'cardano', 'ada', 'solana', 'sol', 'avalanche', 'avax', 'polkadot', 'dot', 'dogecoin',
+               'doge', 'msci world', 'stoxx50', 'nasdaq', 'gold', 'silver', 'swiss market index']
+
 
 # search for certain subreddits
 # reddit_sub_lst = list()
