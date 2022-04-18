@@ -14,42 +14,29 @@ from airflow.models import Variable
 def start():
     logging.info('Starting the DAG "reddit counter airflow"...')
 
+
 def end():
     logging.info('Counting on reddit subs successfully finished.')
 
 
 def _comment_cntr(ti, **kwargs):
-    # sub = 'bitcoin'
-    sub = kwargs.get('templates_dict').get('sub', None)
+    sub = kwargs.get('templates_dict').get('sub', None)     # get subreddit name
     days = 3
-    comm_filter = ['subreddit_id', 'approved_at_utc', 'author_is_blocked', 'comment_type', 'link_title',
-                   'mod_reason_by',
-                   'banned_by', 'ups', 'num_reports', 'author_flair_type', 'total_awards_received', 'link_author',
-                   'likes',
-                   'user_reports', 'saved', 'id', 'banned_at_utc', 'mod_reason_title', 'gilded', 'archived',
-                   'collapsed_reason_code', 'no_follow', 'num_comments', 'can_mod_post', 'send_replies', 'parent_id',
-                   'score', 'author_fullname', 'over_18', 'report_reasons', 'removal_reason', 'approved_by',
-                   'controversiality',
-                   'body', 'edited', 'top_awarded_type', 'downs', 'author_flair_css_class', 'is_submitter', 'collapsed',
-                   'author_flair_richtext', 'author_patreon_flair', 'body_html', 'gildings', 'collapsed_reason',
-                   'distinguished', 'associated_award', 'stickied', 'author_premium', 'can_gild', 'link_id',
-                   'unrepliable_reason', 'author_flair_text_color', 'score_hidden', 'permalink', 'subreddit_type',
-                   'link_permalink', 'name', 'author_flair_template_id', 'subreddit_name_prefixed', 'author_flair_text',
-                   'treatment_tags', 'created', 'created_utc', 'awarders', 'all_awardings', 'locked',
-                   'author_flair_background_color', 'collapsed_because_crowd_control', 'mod_reports', 'quarantine',
-                   'mod_note', 'link_url', '_fetched']
-    limit = None
+    comm_filter = ['id', 'created']                         # keys of comments to get
+    limit = None                                            # No. of comments
     logging.info('Starting comment scraper ...')
     api = PushshiftAPI()
 
-    if limit == None:
-        limit = 100
+    # if limit == None:                                     # for testing
+        # limit = 100
     logging.info(f'Limit set to {limit}.')
 
-    for i in range((days), 0, -1):
+    for i in range((days), 0, -1):                          # reversed range
+        # setting parameters for searching comments
         d = datetime.today().day
         m = datetime.today().month
-        day = datetime(2022, m, d, 0, 0)
+        y = datetime.today().year
+        day = datetime(y, m, d, 0, 0)
         before = int((day - timedelta(days=i)).timestamp())
         after = int((day - timedelta(days=i + 1)).timestamp())
         logging.info(f'Looking for comments in Subreddit {sub} at {datetime.utcfromtimestamp(after)} ...')
@@ -63,7 +50,7 @@ def _comment_cntr(ti, **kwargs):
                                        )
         logging.info(f'Retrieved {len(comments)} comments in Sub {sub} from Pushshift.')
 
-        if i == (days):  # because using the inverse range before
+        if i == (days):                                     # because using the inverse range before
             col_names = ['date', 'sub', 'count']
             df = pd.DataFrame(columns=col_names)
             df.loc[len(df.index)] = [datetime.utcfromtimestamp(after), sub, len(comments)]
@@ -71,12 +58,12 @@ def _comment_cntr(ti, **kwargs):
             df.loc[len(df.index)] = [datetime.utcfromtimestamp(after), sub, len(comments)]
         logging.info(f'Added row: (date: {datetime.utcfromtimestamp(after)}, sub: {sub}, count: {len(comments)}.')
 
-    # push part
+    # push information part
     # first serialize the df to JSON
     df_seri = df.to_json()
     logging.info(f'Variables to push - the_sub: {sub}; the_df: {df_seri}; day_delta: {days} ...')
     ti.xcom_push(key='the_sub', value=sub)
-    ti.xcom_push(key=f'the_df_{sub}', value=df_seri)  # df is not seriable
+    ti.xcom_push(key=f'the_df_{sub}', value=df_seri)
     ti.xcom_push(key='day_delta', value=days)
     logging.info('Variables pushed.')
 
@@ -86,7 +73,7 @@ def upload_s3(**kwargs):
 
     sub = kwargs.get('templates_dict').get('sub', None)
 
-    # pull part
+    # pull information part
     logging.info('Pulling infos ...')
     ti = kwargs['ti']
     sub = ti.xcom_pull(task_ids=f'cnt_task_{sub}', key='the_sub')
@@ -94,7 +81,7 @@ def upload_s3(**kwargs):
     days = ti.xcom_pull(task_ids=f'cnt_task_{sub}', key='day_delta')
     logging.info("Received sub: '%s'" % sub)
 
-    # convert JSON to Pandas-df
+    # convert JSON to Pandas_df
     df2 = pd.read_json(df)
 
     # convert to csv
