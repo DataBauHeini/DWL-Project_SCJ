@@ -109,8 +109,8 @@ def upload_s3(**kwargs):
 
 dag = DAG(
     dag_id='reddit.cntr',
-    start_date=datetime.now(),
-    schedule_interval="@once")
+    start_date=datetime(2022, 4, 1),
+    schedule_interval=timedelta(days=3))
 
 greet_task = PythonOperator(
     task_id="start_task",
