@@ -37,5 +37,5 @@ Code of a AWS Lambda function for extracting and loading the data of the YahooFi
 ## Reddit_HistoricalData - [File](https://github.com/DataBauHeini/DWL-Project_SCJ/blob/main/Reddit_HistoricalData.py)
 blabla
 
-## Airflow - [Folder](https://github.com/DataBauHeini/DWL-Project_SCJ/tree/main/airflow-docker)
+## ApacheAirflow / Reddit_PeriodicalData_Airflow - [Folder](https://github.com/DataBauHeini/DWL-Project_SCJ/tree/main/airflow-docker)
 blabla
