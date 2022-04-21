@@ -1,0 +1,9 @@
+###### Requirements without Version Specifiers ######
+botocore
+python-decouple
+pandas
+praw
+pmaw
+boto3
+
+###### Requirements with Version Specifiers ######

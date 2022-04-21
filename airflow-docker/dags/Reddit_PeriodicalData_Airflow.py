@@ -11,6 +11,7 @@ from airflow.operators.bash import BashOperator
 from airflow.models import Variable
 
 
+# define all necessary functions
 def start():
     logging.info('Starting the DAG "reddit counter airflow"...')
 
@@ -22,12 +23,12 @@ def end():
 def _comment_cntr(ti, **kwargs):
     sub = kwargs.get('templates_dict').get('sub', None)     # get subreddit name
     days = 3
-    comm_filter = ['id', 'created']                         # keys of comments to get
+    comm_filter = ['id', 'created']                         # attributes of comments to get
     limit = None                                            # No. of comments
     logging.info('Starting comment scraper ...')
     api = PushshiftAPI()
 
-    # if limit == None:                                     # for testing
+    # if limit == None:                                     # only for testing
         # limit = 100
     logging.info(f'Limit set to {limit}.')
 
@@ -50,16 +51,16 @@ def _comment_cntr(ti, **kwargs):
                                        )
         logging.info(f'Retrieved {len(comments)} comments in Sub {sub} from Pushshift.')
 
-        if i == (days):                                     # because using the inverse range before
+        # if it is the first run of the loop, create a dataframe
+        if i == days:                                     # because the inverse range was used before
             col_names = ['date', 'sub', 'count']
             df = pd.DataFrame(columns=col_names)
-            df.loc[len(df.index)] = [datetime.utcfromtimestamp(after), sub, len(comments)]
-        else:
-            df.loc[len(df.index)] = [datetime.utcfromtimestamp(after), sub, len(comments)]
+
+        df.loc[len(df.index)] = [datetime.utcfromtimestamp(after), sub, len(comments)]
         logging.info(f'Added row: (date: {datetime.utcfromtimestamp(after)}, sub: {sub}, count: {len(comments)}.')
 
     # push information part
-    # first serialize the df to JSON
+    # first serialize the df to JSON, otherwise it is not possible to push a dataframe
     df_seri = df.to_json()
     logging.info(f'Variables to push - the_sub: {sub}; the_df: {df_seri}; day_delta: {days} ...')
     ti.xcom_push(key='the_sub', value=sub)
@@ -68,9 +69,10 @@ def _comment_cntr(ti, **kwargs):
     logging.info('Variables pushed.')
 
 
-def upload_s3(**kwargs):
+def _upload_s3(**kwargs):
     logging.info('Starting upload to S3 ...')
 
+    # get the subreddit name out of the DAG
     sub = kwargs.get('templates_dict').get('sub', None)
 
     # pull information part
@@ -84,12 +86,12 @@ def upload_s3(**kwargs):
     # convert JSON to Pandas_df
     df2 = pd.read_json(df)
 
-    # convert to csv
+    # convert to csv (the file is safed in a temporary environment inside the Airflow/Docker-environment)
     logging.info('Converting to CSV ...')
     ts = datetime.now().date()
     file_name = str(f'{sub}_Subreddit_{days}d-before_{ts}.csv')
     df2.to_csv(file_name)
-    print(f'Saved {sub} as CSV-File: {file_name}.')
+    logging.info(f'Saved {sub} as CSV-File: {file_name}.')
 
     # upload to S3-Bucket
     s3 = boto3.resource(
@@ -107,11 +109,13 @@ def upload_s3(**kwargs):
     logging.info('Uploading to S3 finished.')
 
 
+# specify the general DAG
 dag = DAG(
     dag_id='reddit.cntr',
     start_date=datetime(2022, 4, 1),
     schedule_interval=timedelta(days=3))
 
+# specify tasks which are running only once
 greet_task = PythonOperator(
     task_id="start_task",
     python_callable=start,
@@ -124,9 +128,11 @@ end_task = PythonOperator(
     dag=dag
 )
 
+# comparing to Reddit_HistoricalData, the list is shortened, because we focus only on the main assets in this stage
 assets_list = ['bitcoin', 'btc', 'eth', 'ethereum', 'binance', 'bnb', 'nasdaq', 'gold']
 
 with dag:
+    # with this for loop, the defined tasks here are executed parallel for each asset in the list before
     for subreddit in assets_list:
         cnt_task = [
             PythonOperator(
@@ -137,20 +143,17 @@ with dag:
                     'sub': subreddit})
         ]
 
+        # only to be sure the operator can have a short break and not confuses itself ;)
         sleep_task = BashOperator(
             task_id=f'sleep_1s_{subreddit}',
             bash_command='sleep 1')
 
         convert_n_upload_task = [PythonOperator(
             task_id=f'conv_upl_task_{subreddit}',
-            python_callable=upload_s3,
+            python_callable=_upload_s3,
             provide_context=True,
                 templates_dict={
                     'sub': subreddit})
         ]
 
         greet_task >> cnt_task >> sleep_task >> convert_n_upload_task >> end_task
-
-
-
-
