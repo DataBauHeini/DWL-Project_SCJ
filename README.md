@@ -10,6 +10,7 @@ It is expected, that the user of this repository has some basic knowledge about:
 ## About the Project
 The idea that you can add value to your finances through a smart investment strategy is something most individuals understand relatively early in life. It is the case, however, that the decision to invest a portion of one's assets is not made until later for many individuals. The main purpose for the whole project  is, to analyse and present the performance of various investment opportunities over the last few months, in order to subsequently provide an overview of investment strategies and opportunities for newcomers.
 
+
 ## Data Source
 Data was extracted from four API
 - Binance: prices and other key figures of top 10 crypto currencies (according to market cap)
