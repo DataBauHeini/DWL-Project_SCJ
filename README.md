@@ -34,6 +34,14 @@ Code of a AWS Lambda function for extracting and loading the data of the YahooFi
 - Database is prepared
 - Database credentials are stored as environmental variable of the lambda function
 
+## BinanceAPI_HistoricalData - [File](https://github.com/DataBauHeini/DWL-Project_SCJ/blob/main/BinanceAPI_HistoricalData.py)
+
+
+
+## BinanceAPI_Lambda_dailyload - [File](https://github.com/DataBauHeini/DWL-Project_SCJ/blob/main/BinanceAPI_Lambda_dailyload.py)
+
+
+
 ## Reddit_HistoricalData - [File](https://github.com/DataBauHeini/DWL-Project_SCJ/blob/main/Reddit_HistoricalData.py)
 Code for extracting, light transforming and load comment data from Reddit to S3 bucket from 1/1/2021 to about 5/4/2022.
 
