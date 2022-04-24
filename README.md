@@ -9,7 +9,7 @@ It is expected, that the user of this repository has some basic knowledge about:
 
 ## About the Project
 The idea that you can add value to your finances through a smart investment strategy is something most individuals understand relatively early in life. It is the case, however, that the decision to invest a portion of one's assets is not made until later for many individuals. The main purpose for the whole project  is, to analyse and present the performance of various investment opportunities over the last few months, in order to subsequently provide an overview of investment strategies and opportunities for newcomers.
-
+<br/>
 
 ## Data Source
 Data was extracted from four API
@@ -17,7 +17,7 @@ Data was extracted from four API
 - YahooFinance: prices and other key figures of four indices and two precious metals
 - Reddit: posts in which the investment assets are mentionned
 - Twitter: Count of tweets which have hashtags of the investment assets
-
+<br/>
 
 ## TwitterAPI_HistoricalData - [File](https://github.com/DataBauHeini/DWL-Project_SCJ/blob/main/TwitterAPI_HistoricalData.ipynb)
 Code for extracting and loading the data of the Twitter API within the period 1/1/2021 - 5/4/2022. Goal of this script was to load the data into the RDS from the beginning of the period, we want to start the analyses, till the start of the daily data load. The code was executed once, as part of the script, the database tables were created.
