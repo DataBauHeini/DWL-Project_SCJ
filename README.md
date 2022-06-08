@@ -5,9 +5,9 @@ It is expected, that the user of this repository has some basic knowledge about:
 - AWS Services [RDS](https://aws.amazon.com/rds/?nc1=h_ls), [Lambda](https://aws.amazon.com/lambda/?nc1=h_ls), [S3](https://aws.amazon.com/s3/?nc1=h_ls)
 - Apache Airflow [Docs](https://airflow.apache.org/docs/apache-airflow/stable/index.html)
 - (Docker [Docs](https://docs.docker.com/), depends on the operating system)
-<br/>
-### DWL_02
-For details of content of the 2nd module of Data Warehouse and Data Lake Systems, please go to the folder [DWL_02](https://github.com/DataBauHeini/DWL-Project_SCJ/tree/main/DWL_02)
+
+### !! DWL_02 !! 
+For details of contents of the second part of the project for the second module of Data Warehouse and Data Lake Systems, please refer the folder [DWL_02](https://github.com/DataBauHeini/DWL-Project_SCJ/tree/main/DWL_02)
 
 ## About the Project
 The idea that you can add value to your finances through a smart investment strategy is something most individuals understand relatively early in life. It is the case, however, that the decision to invest a portion of one's assets is not made until later for many individuals. The main purpose for the whole project  is, to analyse and present the performance of various investment opportunities over the last few months, in order to subsequently provide an overview of investment strategies and opportunities for newcomers.
